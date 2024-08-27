@@ -1,54 +1,46 @@
-const edgeList = [];
-
-function knightMoves([i, j], [l, m] = []) {
-  if (i < 0 || j < 0 || i > 7 || j > 7) {
-    return "The knight cannot be at this location.";
-  } else if (i === l && j === m) {
-    return [i, j];
+// Helper function that creates a node including the position and path.
+function Node(pos, path) {
+  if (pos[0] < 0 || pos[0] > 7 || pos[1] < 0 || pos[1] > 7) {
+    return null;
   }
 
-  const movesList = possibleMoves([i, j]);
-  for (const move of movesList) {
-    if (move[0] === l && move[1] === m) {
-      return [[i, j], knightMoves([l, m], [5, 4])];
-    }
-  }
+  return { pos, path };
 }
 
-function possibleMoves([i, j]) {
-  if (i + 2 < 8 && j + 1 < 8) {
-    edgeList.push([i + 2, j + 1]);
+// knightMoves([0, 0], [3, 3]);
+function knightMoves(start, target) {
+  const queue = [Node(start, [start])];
+  let currentNode = queue.shift();
+
+  while (currentNode.pos[0] !== target[0] || currentNode.pos[1] !== target[1]) {
+    let moves = [
+      [currentNode.pos[0] + 2, currentNode.pos[1] - 1],
+      [currentNode.pos[0] + 2, currentNode.pos[1] + 1],
+      [currentNode.pos[0] - 2, currentNode.pos[1] - 1],
+      [currentNode.pos[0] - 2, currentNode.pos[1] + 1],
+      [currentNode.pos[0] + 1, currentNode.pos[1] - 2],
+      [currentNode.pos[0] + 1, currentNode.pos[1] + 2],
+      [currentNode.pos[0] - 1, currentNode.pos[1] - 2],
+      [currentNode.pos[0] - 1, currentNode.pos[1] + 2],
+    ];
+
+    moves.forEach((move) => {
+      const node = Node(move, currentNode.path.concat([move]));
+      if (node) {
+        queue.push(node);
+      }
+    });
+
+    currentNode = queue.shift();
   }
 
-  if (i + 1 < 8 && j + 2 < 8) {
-    edgeList.push([i + 1, j + 2]);
-  }
+  console.log(
+    `You made it in ${currentNode.path.length - 1} moves! Here's your path:`
+  );
 
-  if (i + 2 < 8 && j - 1 > 0) {
-    edgeList.push([i + 2, j - 1]);
-  }
-
-  if (i + 1 < 8 && j - 2 > 0) {
-    edgeList.push([i + 1, j - 2]);
-  }
-
-  if (i - 2 > 0 && j - 1 > 0) {
-    edgeList.push([i - 2, j - 1]);
-  }
-
-  if (i - 1 > 0 && j - 2 > 0) {
-    edgeList.push([i - 1, j - 2]);
-  }
-
-  if (i - 2 > 0 && j + 1 < 8) {
-    edgeList.push([i - 2, j + 1]);
-  }
-
-  if (i - 1 > 0 && j + 2 < 8) {
-    edgeList.push([i - 1, j + 2]);
-  }
-
-  return edgeList;
+  currentNode.path.forEach((pos) => {
+    console.log(pos);
+  });
 }
 
-console.log(knightMoves([3, 3], [5, 4]));
+knightMoves([0, 0], [7, 7]);
